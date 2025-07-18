@@ -1,3 +1,9 @@
+extern crate termios;
+use std::io;
+use std::io::Read;
+use std::io::Write;
+use termios::{Termios, TCSANOW, ECHO, ICANON, tcsetattr};
+
 fn main() {
     let mut x:i32 = 0;
     let mut y:i32 = 0;
@@ -11,9 +17,23 @@ fn main() {
     let mut wx1kill:i32 = 0;
     let mut inventory:Vec<String> = Vec::new();
 
+    let stdin = 0;
+    let termios = Termios::from_fd(stdin).unwrap();
+    let mut new_termios = termios.clone();
+
+
     println!("\nWelcome to WormmenInvasion! \n\nYou are at the ground floor. There's a brick wall to your left. \nThere's a ladder in sight, and a dim glow beyond the ladder. \n\nMove your character with wasd. Press i for inventory. Press h for help.\n");
 
-    while game == true {
+    while game == true {        
+        new_termios.c_lflag &= !(ICANON | ECHO);
+        tcsetattr(stdin, TCSANOW, &mut new_termios).unwrap();
+        let stdout = io::stdout();
+        let mut reader = io::stdin();
+        let mut buffer = [0;1];
+        print!("Hit a key! ");
+        stdout.lock().flush().unwrap();
+        reader.read_exact(&mut buffer).unwrap();
+        println!("You have hit: {:?}", buffer);tcsetattr(stdin, TCSANOW, & termios).unwrap();
         let last = x;
         let mut choice = String::new();
         let input = std::io::stdin().read_line(&mut choice).expect("Failed to read line");
