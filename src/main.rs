@@ -17,36 +17,39 @@ fn main() {
     let mut wx1kill:i32 = 0;
     let mut inventory:Vec<String> = Vec::new();
 
-    let stdin = 0;
-    let termios = Termios::from_fd(stdin).unwrap();
-    let mut new_termios = termios.clone();
 
 
     println!("\nWelcome to WormmenInvasion! \n\nYou are at the ground floor. There's a brick wall to your left. \nThere's a ladder in sight, and a dim glow beyond the ladder. \n\nMove your character with wasd. Press i for inventory. Press h for help.\n");
 
-    while game == true {        
+    while game == true {         
+        let stdin = 0;
+        let termios = Termios::from_fd(stdin).unwrap();
+        let mut new_termios = termios.clone();
         new_termios.c_lflag &= !(ICANON | ECHO);
         tcsetattr(stdin, TCSANOW, &mut new_termios).unwrap();
         let stdout = io::stdout();
         let mut reader = io::stdin();
         let mut buffer = [0;1];
-        print!("Hit a key! ");
         stdout.lock().flush().unwrap();
         reader.read_exact(&mut buffer).unwrap();
-        println!("You have hit: {:?}", buffer);tcsetattr(stdin, TCSANOW, & termios).unwrap();
+        tcsetattr(stdin, TCSANOW, & termios).unwrap();
+
+        //w ==119, a ==97, d = 100, s == 115, e = 101, x =120, 
+
         let last = x;
-        let mut choice = String::new();
-        let input = std::io::stdin().read_line(&mut choice).expect("Failed to read line");
-        if choice.contains("h") {
+       // let mut choice = String::new();
+       // let input = std::io::stdin().read_line(&mut choice).expect("Failed to read line");
+
+        if buffer == [104] {
             println!("Wormmen Invasion is a text based 2D platformer.\nMove your character using wasd. Press i for inventory. Press h for help.\n");
         }
-        if choice.contains("i") {
+        if buffer == ([105]) {
             println!("Inventory: {:?}", inventory);
         }
-        if choice.contains("a") {
+        if buffer == [97] {
             x -= 1;
         }
-        if choice.contains("d") {
+        if buffer == [100] {
             x += 1;
         }
         
@@ -67,7 +70,7 @@ fn main() {
             }
             if x == 10 {
                 if lantern_picked_up == false {
-                    if choice.contains("e") {
+                    if buffer == [101] {
                         inventory.push("lantern".to_string());
                         lantern_picked_up = true;
                         println!("You picked up the lantern");
@@ -81,8 +84,8 @@ fn main() {
         } else if y == 1 {
             if x == 5 {
                 ladder_down = true;
-                if choice.contains("s") {
-                ladder_up = true;
+                if buffer == [115] {
+                    ladder_up = true;
                 }
             }
             if x == 4 || x == 6 {
@@ -90,9 +93,9 @@ fn main() {
             }
             if x == 1 {
                 println!("Stone stairs leads down into darkness.");
-                if choice.contains("s") {
+                if buffer == [115] {
                     if inventory.contains(&"lantern".to_string()) {
-                        println!("You are in a dark cellar, but his lantern guides the path.\nSome weird sounds can be heard from the tunnel to the left.\nTo the right there is a hole in the ground and a rock wall.");
+                        println!("You are in a dark cellar, but your lantern guides the path.\nSome weird sounds can be heard from the tunnel to the left.\nTo the right there is a hole in the ground and a rock wall.");
                         y = -1;
                         x = 0;
                     } else {
@@ -111,7 +114,7 @@ fn main() {
         } else if y == -1 {
             if x == 4 {
                 println!("The hole is deep and dark, but small. You can step over or go down.");
-                if choice.contains("s") {
+                if buffer == [115] {
                     println!("You jump into the hole, and land in the sewers. The stench is unbearable.");
                     y = -2;
                 }
@@ -119,6 +122,13 @@ fn main() {
             if x > 7 {
                 println!("You've reached the wall. The natural rock indicates you are under ground.");
                 x = 8;
+            }
+            if x == 0 {
+                println!("There's a staircase going up.");
+                if buffer == [119] {
+                    y = 1;
+                    println!("There's a staircase going down.");
+                }
             }
             if x == -6 {
                 if last == -5 {
@@ -131,12 +141,12 @@ fn main() {
                 }
             }
             if x == -15 {
-                println!("Wormmen fall down from the ceiling, grab you from the darkness, crawl at you on the ground. You die in terroras slimy mouths devour you.");
+                println!("Wormmen fall down from the ceiling, grab you from the darkness, crawl at you on the ground. You die in terror as slimy mouths devour you.");
                 break
             }
         }
         if ladder_up == true {
-            if choice.contains("w") {
+            if buffer ==[119] {
                 ladder_up = false;
                 ladder_down = true;
                 y += 1;
@@ -146,10 +156,11 @@ fn main() {
             }
         }
         if ladder_down == true {
-            if choice.contains("s") {
+            if buffer == [115] {
                 ladder_down = false;
                 ladder_up = true;
                 y -= 1;
+            } else {
                 println!("There's a ladder going down.");
             }
         }
@@ -172,7 +183,7 @@ fn main() {
                 break
             }
         }
-        if choice.contains("x") {
+        if buffer == [120] {
             break
         }
         println!("{} , {}", x, y);
