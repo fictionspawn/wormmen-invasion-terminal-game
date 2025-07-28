@@ -34,11 +34,7 @@ fn main() {
         reader.read_exact(&mut buffer).unwrap();
         tcsetattr(stdin, TCSANOW, & termios).unwrap();
 
-        //w ==119, a ==97, d = 100, s == 115, e = 101, x =120, 
-
         let last = x;
-       // let mut choice = String::new();
-       // let input = std::io::stdin().read_line(&mut choice).expect("Failed to read line");
 
         if buffer == [104] {
             println!("Wormmen Invasion is a text based 2D platformer.\nMove your character using wasd. Press i for inventory. Press h for help.\n");
@@ -62,7 +58,12 @@ fn main() {
                 x = 0;
             }
             if x > 13 {
-                println!("You reach a locked door.");
+                if inventory.contains(&"Dungeon Key".to_string()) {
+                    println!("Congratulations! You escaped the dungeon!");
+                    break;
+                } else {
+                    println!("You reach a locked door.");
+                }
                 x = 14;
             }
             if x == 4 || x == 6 {
@@ -71,7 +72,7 @@ fn main() {
             if x == 10 {
                 if lantern_picked_up == false {
                     if buffer == [101] {
-                        inventory.push("lantern".to_string());
+                        inventory.push("Lantern".to_string());
                         lantern_picked_up = true;
                         println!("You picked up the lantern");
                 } else {
@@ -94,7 +95,7 @@ fn main() {
             if x == 1 {
                 println!("Stone stairs leads down into darkness.");
                 if buffer == [115] {
-                    if inventory.contains(&"lantern".to_string()) {
+                    if inventory.contains(&"Lantern".to_string()) {
                         println!("You are in a dark cellar, but your lantern guides the path.\nSome weird sounds can be heard from the tunnel to the left.\nTo the right there is a hole in the ground and a rock wall.");
                         y = -1;
                         x = 0;
@@ -117,6 +118,13 @@ fn main() {
                 if buffer == [115] {
                     println!("You jump into the hole, and land in the sewers. The stench is unbearable.");
                     y = -2;
+                }
+            }
+            if x == 5 {
+                println!("There's a key on the ground.");
+                if buffer == [101] {
+                    inventory.push("Dungeon Key".to_string());
+                    println!("You picked up the key");
                 }
             }
             if x > 7 {
