@@ -11,14 +11,14 @@ pub fn intro() {
 pub fn play_game() {
     let mut x:i32 = 0;
     let mut y:i32 = 0;
-    let mut game:bool = true;
+    let game:bool = true;
     let mut ladder_up:bool = false;
     let mut ladder_down:bool = false;
     let mut lantern_picked_up:bool = false;
     let mut wormman = false;
     let mut wx1 = 10;
-    let mut wy1 = 1;
-    let mut wx1kill:i32 = 0;
+    let wy1 = 1;
+    let mut wx1kill:i32;
     let mut inventory:Vec<String> = Vec::new();
 
 
