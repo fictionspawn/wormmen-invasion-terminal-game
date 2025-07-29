@@ -10,12 +10,7 @@ pub struct MoveChar {
     ladder_up: bool,
     ladder_down: bool,
 }
-/*
-impl MoveChar {
-    const mut x = 0;
-    const mut y = 0;
-}
-*/
+
 pub struct MoveWormman {
     wormman: bool,
     wx1: i32,
@@ -49,18 +44,6 @@ pub fn play_game() {
         inventory: Vec::new(),
         lantern_picked_up: false,
     };
-/*
-    let mut x:i32 = 0;
-   // let mut y:i32 = 0;
-    let mut ladder_up:bool = false;
-    let mut ladder_down:bool = false;
-    let mut lantern_picked_up:bool = false;
-    let mut wormman = false;
-    let mut wx1 = 10;
-    let wy1 = 1;
-    let mut wx1kill:i32;
-    let mut inventory:Vec<String> = Vec::new();
-*/
 
     let game:bool = true;
 
