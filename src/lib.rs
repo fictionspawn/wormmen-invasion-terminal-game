@@ -1,14 +1,27 @@
+mod groundfloor;
+use crate::groundfloor::ground_floor;
+mod firstfloor;
+use crate::firstfloor::{first_floor, climb_lamp};
+mod basement;
+use crate::basement::{basement, sewers};
+mod wormman;
+use crate::wormman::wormman_move;
+mod ladderupdown;
+use crate::ladderupdown::ladder_up_down;
+
 extern crate termios;
 use std::io;
 use std::io::Read;
 use std::io::Write;
 use termios::{Termios, TCSANOW, ECHO, ICANON, tcsetattr};
 
+
 pub struct MoveChar {
     x: i32,
     y: i32,   
     ladder_up: bool,
     ladder_down: bool,
+    sewer_stepcount: i32,
 }
 
 pub struct MoveWormman {
@@ -21,6 +34,7 @@ pub struct MoveWormman {
 pub struct Item {
     inventory: Vec<String>,
     lantern_picked_up: bool,
+    key_picked_up: bool,
 }
 
 
@@ -35,6 +49,7 @@ pub fn play_game() {
         y: 0,
         ladder_up: false,
         ladder_down: false,
+        sewer_stepcount: 0,
     };
     let mut move_wormman = MoveWormman {
         wormman: false,
@@ -45,15 +60,15 @@ pub fn play_game() {
     let mut item = Item {
         inventory: Vec::new(),
         lantern_picked_up: false,
+        key_picked_up: false,
     };
 
     let game:bool = true;
     let mut death:bool = false;
 
     while game == true {   
-        if death {
-            break;
-        }
+
+        //Game contol, keydown movement
         let stdin = 0;
         let termios = Termios::from_fd(stdin).unwrap();
         let mut new_termios = termios.clone();
@@ -69,7 +84,7 @@ pub fn play_game() {
         let last = move_char.x;
 
         if buffer == [104] {
-            println!("Wormmen Invasion is a text based 2D platformer.\nMove your character using wasd. Press i for inventory. Press h for help.\n");
+            println!("Wormmen Invasion is a text based 2D platformer.\nMove your character using wasd. Press i for inventory.\nPress h for help. Press x to exit the game.");
         }
         if buffer == ([105]) {
             println!("Inventory: {:?}", item.inventory);
@@ -80,175 +95,30 @@ pub fn play_game() {
         if buffer == [100] {
             move_char.x += 1;
         }
-        
         if move_char.y == 0 {
-            ground_floor(&mut move_char, &mut item, &mut buffer, &mut death);
+            ground_floor(&mut move_char, &mut item, buffer, &mut death);
         } else if move_char.y == 1 {
-            first_floor(&mut move_char, &mut item, &mut buffer);
+            first_floor(&mut move_char, &mut item, buffer);
         } else if move_char.y == -1 {
-            basement(&mut move_char, &mut item, &mut buffer, &mut death, last);
+            basement(&mut move_char, &mut item, buffer, &mut death, last);
+        } else if move_char.y == 2 {
+           climb_lamp(&mut move_char, buffer);
+        } else if move_char.y == -2 {
+            sewers(&mut move_char, &mut death);
         }
-        ladder_up_down(&mut move_char, &mut buffer);
+        ladder_up_down(&mut move_char, buffer);
         wormman_move(&mut move_wormman, &mut move_char, &mut death);
+        if death {
+            break;
+        }
         if buffer == [120] {
             break
         }
         println!("{} , {}", move_char.x, move_char.y);
-        if move_char.y == 1 || (move_char.x == 5 && move_char.y == 0) {
+        if move_char.y == 1 || (move_char.x == 5 && move_char.y == 0) || move_char.y == 2 {
             println!("Wormman: {}, {}", move_wormman.wx1, move_wormman.wy1);
         }
     }
 }
 
-fn wormman_move(move_wormman: &mut MoveWormman, move_char: &mut MoveChar, death: &mut bool) {
-    if move_wormman.wx1 < -2 {
-        move_wormman.wormman = true;
-    }
-    if move_wormman.wx1 > 13 {
-        move_wormman.wormman = false;
-    }
-    if move_wormman.wormman {
-        move_wormman.wx1 += 1;
-        move_wormman.wx1kill = move_wormman.wx1 + 1;
-    } else {
-        move_wormman.wx1 -= 1;
-        move_wormman.wx1kill = move_wormman.wx1 - 1;
-    }
-    if move_wormman.wx1 == move_char.x || move_wormman.wx1kill == move_char.x {
-        if move_wormman.wy1 == move_char.y {
-            println!("The wormman eats you alive as you scream in terror.");
-           *death = true;
-        }
-    }
-}
 
-fn ladder_up_down(move_char: &mut MoveChar, buffer: &mut [u8; 1]) {
-    if move_char.ladder_up == true {
-        if *buffer ==[119] {
-            move_char.ladder_up = false;
-            move_char.ladder_down = true;
-            move_char.y += 1;
-            println!("There's a disgusting creature with human upper body and worm tail for legs crawling back and forth.");
-        } else {
-            println!("There's a ladder going up.");
-        }
-    }
-    if move_char.ladder_down == true {
-        if *buffer == [115] {
-            move_char.ladder_down = false;
-            move_char.ladder_up = true;
-            move_char.y -= 1;
-        } else {
-            println!("There's a ladder going down.");
-        }
-    }
-}
-
-fn ground_floor(move_char: &mut MoveChar, item: &mut Item, buffer: &mut [u8; 1], death: &mut bool) {
-    if move_char.x == 5 {
-        move_char.ladder_up = true;
-    }
-    if move_char.x < 1 {
-        println!("There's a solid brick wall to your left.");
-        move_char.x = 0;
-    }
-    if move_char.x > 13 {
-        if item.inventory.contains(&"Dungeon Key".to_string()) {
-            println!("Congratulations! You escaped the dungeon!");
-            *death = true;
-        } else {
-            println!("You reach a locked door.");
-        }
-        move_char.x = 14;
-    }
-    if move_char.x == 4 || move_char.x == 6 {
-        move_char.ladder_up = false;
-    }
-    if move_char.x == 10 {
-        if item.lantern_picked_up == false {
-            if *buffer == [101] {
-                item.inventory.push("Lantern".to_string());
-                item.lantern_picked_up = true;
-                println!("You picked up the lantern");
-            } else {
-                println!("There's a body on the ground. He or she, it's hard to tell from all the gore, holds a lantern. Press \"e\" to pick it up.");
-            }
-        } else {
-            println!("There's a body on the ground. It looks like it has been eaten by something.");
-        }            
-    }
-}
-
-fn first_floor(move_char: &mut MoveChar, item: &mut Item, buffer: &mut [u8; 1]) {
-    if move_char.x == 5 {
-        move_char.ladder_down = true;
-        if *buffer == [115] {
-            move_char.ladder_up = true;
-        }
-    }
-    if move_char.x == 4 || move_char.x == 6 {
-        move_char.ladder_down = false;
-    }
-    if move_char.x == 1 {
-        println!("Stone stairs leads down into darkness.");
-        if *buffer == [115] {
-            if item.inventory.contains(&"Lantern".to_string()) {
-                println!("You are in a dark cellar, but your lantern guides the path.\nSome weird sounds can be heard from the tunnel to the left.\nTo the right there is a hole in the ground and a rock wall.");
-                move_char.y = -1;
-                move_char.x = 0;
-            } else {
-                println!("It's too dark to go down there.");
-            }
-        }
-    }
-    if move_char.x < -2 {
-        println!("You've reached the  Wall");
-        move_char.x = -3;
-    }
-    if move_char.x > 18 {
-        println!("You've reached a wall");
-        move_char.x = 19;
-    }
-}
-
-fn basement(move_char: &mut MoveChar, item: &mut Item, buffer: &mut [u8; 1], death: &mut bool, last: i32) {
-    if move_char.x == 4 {
-        println!("The hole is deep and dark, but small. You can step over or go down.");
-        if *buffer == [115] {
-            println!("You jump into the hole, and land in the sewers. The stench is unbearable.");
-            move_char.y = -2;
-        }
-    }
-    if move_char.x == 5 {
-        println!("There's a key on the ground.");
-        if *buffer == [101] {
-            item.inventory.push("Dungeon Key".to_string());
-            println!("You picked up the key");
-        }
-    }
-    if move_char.x > 7 {
-        println!("You've reached the wall. The natural rock indicates you are under ground.");
-        move_char.x = 8;
-    }
-    if move_char.x == 0 {
-        println!("There's a staircase going up.");
-        if *buffer == [119] {
-            move_char.y = 1;
-            println!("There's a staircase going down.");
-        }
-    }
-    if move_char.x == -6 {
-        if last == -5 {
-            println!("The sounds from the darkness are getting closer.");
-        }
-    }
-    if move_char.x == -12 {
-        if last == -11 {
-            println!("Something moves in the shadows.");
-        }
-    }
-    if move_char.x == -15 {
-        println!("Wormmen fall down from the ceiling, grab you from the darkness, crawl at you on the ground. You die in terror as slimy mouths devour you.");
-        *death = true;
-    }
-}
