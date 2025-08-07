@@ -46,6 +46,48 @@ pub struct Item {
     blade_taken: bool,
 }
 
+pub struct GameState {
+    pub move_char: MoveChar,
+    pub item: Item,
+    pub death: bool,
+    pub move_wormman: MoveWormman,
+    pub window_wormman: WindowWormman,
+} 
+
+impl GameState {
+    pub fn new() -> Self {
+        GameState {
+            move_char: MoveChar {
+                x: 0,
+                y: 0,
+                ladder_up: false,
+                ladder_down: false,
+                sewer_stepcount: 0,
+                step_count: 0,
+            },
+            item: Item {
+                inventory: Vec::new(),
+                lantern_picked_up: false, 
+                key_picked_up: false,
+                blade_taken: false,
+            },
+            death: false,
+            move_wormman: MoveWormman {
+                wormman: false,
+                wx1: 10,
+                wy1: 1,
+                wx1kill: 11,
+            },
+            window_wormman: WindowWormman {
+                wormman: false,
+                x: 12,
+                y: 3,
+                wwkill: 11,
+            },
+            //last_x: 0,
+        }
+    }
+}
 
 
 pub fn intro() { 
@@ -53,37 +95,12 @@ pub fn intro() {
 }
 
 pub fn play_game() {
-    let mut move_char = MoveChar {
-        x: 0,
-        y: 0,
-        ladder_up: false,
-        ladder_down: false,
-        sewer_stepcount: 0,
-        step_count: 0,
-    };
-    let mut move_wormman = MoveWormman {
-        wormman: false,
-        wx1: 10,
-        wy1: 1,
-        wx1kill: 11, 
-    };
-    let mut window_wormman = WindowWormman {
-        wormman: false,
-        x: 12,
-        y: 3,
-        wwkill: 11,
-    };
-    let mut item = Item {
-        inventory: Vec::new(),
-        lantern_picked_up: false,
-        key_picked_up: false,
-        blade_taken: false,
-    };
+    let mut state = GameState::new();
 
     let game:bool = true;
-    let mut death:bool = false;
+  //  let mut death:bool = false;
 
-    while game == true {   
+    while game {   
 
         //Game contol, keydown movement
         let stdin = 0;
@@ -98,48 +115,48 @@ pub fn play_game() {
         reader.read_exact(&mut buffer).unwrap();
         tcsetattr(stdin, TCSANOW, & termios).unwrap();
 
-        let last = move_char.x;
-        move_char.step_count += 1;
+        let last = state.move_char.x;
+        state.move_char.step_count += 1;
 
         if buffer == [104] {
             println!("Wormmen Invasion is a text based 2D platformer.\nMove your character using wasd. Press i for inventory.\nPress h for help. Press x to exit the game.");
         }
         if buffer == ([105]) {
-            println!("Inventory: {:?}", item.inventory);
+            println!("Inventory: {:?}", state.item.inventory);
         }
         if buffer == [97] {
-            move_char.x -= 1;
+            state.move_char.x -= 1;
         }
         if buffer == [100] {
-            move_char.x += 1;
+            state.move_char.x += 1;
         }
-        if move_char.y == 0 {
-            ground_floor(&mut move_char, &mut item, buffer, &mut death);
-        } else if move_char.y == 1 {
-            first_floor(&mut move_char, &mut item, buffer);
-        } else if move_char.y == -1 {
-            basement(&mut move_char, &mut item, buffer, &mut death, last);
-        } else if move_char.y == 2 {
-           climb_lamp(&mut move_char, buffer);
-        } else if move_char.y == -2 {
-            sewers(&mut move_char, &mut death);
-        } else if move_char.y == 3 {
-            attic(&mut move_char, &mut window_wormman, &mut item, buffer, &mut death);
+        if state.move_char.y == 0 {
+            ground_floor(&mut state, buffer);
+        } else if state.move_char.y == 1 {
+            first_floor(&mut state, buffer);
+        } else if state.move_char.y == -1 {
+            basement(&mut state, buffer, last);
+        } else if state.move_char.y == 2 {
+           climb_lamp(&mut state, buffer);
+        } else if state.move_char.y == -2 {
+            sewers(&mut state);
+        } else if state.move_char.y == 3 {
+            attic(&mut state, buffer);
         }
-        ladder_up_down(&mut move_char, buffer);
-        wormman_move(&mut move_wormman, &mut move_char, &mut death);
+        ladder_up_down(&mut state, buffer);
+        wormman_move(&mut state);
 
-        println!("Step count: {}", move_char.step_count);
+        println!("Step count: {}", state.move_char.step_count);
 
-        if death {
+        if state.death {
             break;
         }
         if buffer == [120] {
             break
         }
-        println!("{} , {}", move_char.x, move_char.y);
-        if move_char.y == 1 || (move_char.x == 5 && move_char.y == 0) || move_char.y == 2  || (move_char.y == 3 && move_char.x == 10) {
-            println!("Wormman: {}, {}", move_wormman.wx1, move_wormman.wy1);
+        println!("{} , {}", state.move_char.x, state.move_char.y);
+        if state.move_char.y == 1 || (state.move_char.x == 5 && state.move_char.y == 0) || state.move_char.y == 2  || (state.move_char.y == 3 && state.move_char.x == 10) {
+            println!("Wormman: {}, {}", state.move_wormman.wx1, state.move_wormman.wy1);
         }
     }
 }
