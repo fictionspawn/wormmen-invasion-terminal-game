@@ -64,7 +64,7 @@ pub fn attic(state: &mut GameState, buffer: [u8; 1]) {
         }
     } else if state.move_char.x <= 5 {
         if buffer == [101] && !state.item.blade_taken {
-            println!("You touch the man's shoulder, to see if he needs help.\nHe coughs. \"They... they are everywhere. Be care...ful.\"\nYou try to confort him, but his wounds tells their own tale.\n\"Here, take this. It will protect you.\"\nHe holds out a knife, a dagger with a dark blade. \"It's magi...*\"\nHe dies. You take the blade.");
+            println!("You touch the man's shoulder, to see if he needs help.\nHe coughs. \"They... they are everywhere. Be care...ful.\"\nYou try to comfort him, but his wounds tells their own tale.\n\"Here, take this. It will protect you.\"\nHe holds out a knife, a dagger with a dark blade. \"It's magi...*\"\nHe dies. You take the blade.");
             state.item.blade_taken = true;
         } else if !state.item.blade_taken {
             println!("The man stares into nothingness. He seems to be alive.");

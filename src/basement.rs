@@ -23,7 +23,13 @@ pub fn basement(state: &mut GameState, buffer: [u8; 1], last: i32) {
         state.move_char.x = 8;
     }
     if state.move_char.x == 0 {
-        println!("There's a staircase going up.");
+        let something: &str;
+        if state.move_wormman.wx1 < 5 {
+            something = "You hear the wormman crawl around up there.";
+        } else { 
+            something = "";
+        }
+        println!("There's a staircase going up. {}", something);
         if buffer == [119] {
             state.move_char.y = 1;
             state.move_char.x = 1;
