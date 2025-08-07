@@ -1,7 +1,7 @@
 mod groundfloor;
 use crate::groundfloor::ground_floor;
 mod firstfloor;
-use crate::firstfloor::{first_floor, climb_lamp};
+use crate::firstfloor::{first_floor, climb_lamp, attic};
 mod basement;
 use crate::basement::{basement, sewers};
 mod wormman;
@@ -21,7 +21,8 @@ pub struct MoveChar {
     y: i32,   
     ladder_up: bool,
     ladder_down: bool,
-    sewer_stepcount: i32,
+    sewer_stepcount: u32,
+    step_count: u32,
 }
 
 pub struct MoveWormman {
@@ -31,16 +32,24 @@ pub struct MoveWormman {
     wx1kill: i32,
 }
 
+pub struct WindowWormman {
+    wormman: bool,
+    x: i32,
+    y: i32,
+    wwkill: i32,
+}
+
 pub struct Item {
     inventory: Vec<String>,
     lantern_picked_up: bool,
     key_picked_up: bool,
+    blade_taken: bool,
 }
 
 
 
 pub fn intro() { 
-    println!("\nWelcome to WormmenInvasion! \n\nYou are at the ground floor. There's a brick wall to your left. \nThere's a ladder in sight, and a dim glow beyond the ladder. \n\nMove your character with wasd. Press i for inventory. Press h for help.\n");
+    println!("\nWelcome to WormmenInvasion! \n\nYou are at the ground floor. There's a brick wall to your left. \nThere's a ladder in sight, and a dim glow beyond the ladder. \n\nMove your character with wasd. Press i for inventory. Press h for help, x to exit the game.\n");
 }
 
 pub fn play_game() {
@@ -50,6 +59,7 @@ pub fn play_game() {
         ladder_up: false,
         ladder_down: false,
         sewer_stepcount: 0,
+        step_count: 0,
     };
     let mut move_wormman = MoveWormman {
         wormman: false,
@@ -57,10 +67,17 @@ pub fn play_game() {
         wy1: 1,
         wx1kill: 11, 
     };
+    let mut window_wormman = WindowWormman {
+        wormman: false,
+        x: 12,
+        y: 3,
+        wwkill: 11,
+    };
     let mut item = Item {
         inventory: Vec::new(),
         lantern_picked_up: false,
         key_picked_up: false,
+        blade_taken: false,
     };
 
     let game:bool = true;
@@ -82,6 +99,7 @@ pub fn play_game() {
         tcsetattr(stdin, TCSANOW, & termios).unwrap();
 
         let last = move_char.x;
+        move_char.step_count += 1;
 
         if buffer == [104] {
             println!("Wormmen Invasion is a text based 2D platformer.\nMove your character using wasd. Press i for inventory.\nPress h for help. Press x to exit the game.");
@@ -105,9 +123,14 @@ pub fn play_game() {
            climb_lamp(&mut move_char, buffer);
         } else if move_char.y == -2 {
             sewers(&mut move_char, &mut death);
+        } else if move_char.y == 3 {
+            attic(&mut move_char, &mut window_wormman, &mut item, buffer, &mut death);
         }
         ladder_up_down(&mut move_char, buffer);
         wormman_move(&mut move_wormman, &mut move_char, &mut death);
+
+        println!("Step count: {}", move_char.step_count);
+
         if death {
             break;
         }
@@ -115,7 +138,7 @@ pub fn play_game() {
             break
         }
         println!("{} , {}", move_char.x, move_char.y);
-        if move_char.y == 1 || (move_char.x == 5 && move_char.y == 0) || move_char.y == 2 {
+        if move_char.y == 1 || (move_char.x == 5 && move_char.y == 0) || move_char.y == 2  || (move_char.y == 3 && move_char.x == 10) {
             println!("Wormman: {}, {}", move_wormman.wx1, move_wormman.wy1);
         }
     }

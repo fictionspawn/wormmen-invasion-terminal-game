@@ -26,6 +26,7 @@ pub fn basement(move_char: &mut MoveChar, item: &mut Item, buffer: [u8; 1], deat
         println!("There's a staircase going up.");
         if buffer == [119] {
             move_char.y = 1;
+            move_char.x = 1;
             println!("There's a staircase going down.");
         }
     }
