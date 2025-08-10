@@ -22,16 +22,16 @@ pub fn basement(state: &mut GameState, buffer: [u8; 1], last: i32) {
         println!("You've reached the wall. The natural rock indicates you are under ground.");
         state.move_char.x = 8;
     }
-    if state.move_char.x == 0 {
+    if state.move_char.x == 2 {
         let something: &str;
-        if state.move_wormman.wx1 < 5 {
+        if state.move_wormman.x < 5 && state.move_wormman.wormman {
             something = "You hear the wormman crawl around up there.";
         } else { 
             something = "";
         }
         println!("There's a staircase going up. {}", something);
         if buffer == [119] {
-            state.move_char.y = 1;
+            state.move_char.y = 0;
             state.move_char.x = 1;
             println!("There's a staircase going down.");
         }

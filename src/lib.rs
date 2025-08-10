@@ -1,13 +1,15 @@
 mod groundfloor;
 use crate::groundfloor::ground_floor;
 mod firstfloor;
-use crate::firstfloor::{first_floor, climb_lamp, attic};
+use crate::firstfloor::{first_floor};
 mod basement;
 use crate::basement::{basement, sewers};
 mod wormman;
-use crate::wormman::wormman_move;
+use crate::wormman::{wormman_move, window_wormman};
 mod ladderupdown;
-use crate::ladderupdown::ladder_up_down;
+use crate::ladderupdown::{ladder_up_down, climb_lamp};
+mod attic;
+use crate::attic::attic;
 
 extern crate termios;
 use std::io;
@@ -26,17 +28,12 @@ pub struct MoveChar {
 }
 
 pub struct MoveWormman {
-    wormman: bool,
-    wx1: i32,
-    wy1: i32,
-    wx1kill: i32,
-}
-
-pub struct WindowWormman {
+    wormman_init: bool,
+    wormman_right: bool,
     wormman: bool,
     x: i32,
     y: i32,
-    wwkill: i32,
+    wkill: i32,
 }
 
 pub struct Item {
@@ -51,7 +48,7 @@ pub struct GameState {
     pub item: Item,
     pub death: bool,
     pub move_wormman: MoveWormman,
-    pub window_wormman: WindowWormman,
+    pub window_wormman: MoveWormman,
 } 
 
 impl GameState {
@@ -73,18 +70,21 @@ impl GameState {
             },
             death: false,
             move_wormman: MoveWormman {
-                wormman: false,
-                wx1: 10,
-                wy1: 1,
-                wx1kill: 11,
+                wormman_init: true,
+                wormman_right: false,
+                wormman: true,
+                x: 10,
+                y: 1,
+                wkill: 11,
             },
-            window_wormman: WindowWormman {
+            window_wormman: MoveWormman {
+                wormman_init: false,
+                wormman_right: false,
                 wormman: false,
                 x: 12,
                 y: 3,
-                wwkill: 11,
+                wkill: 11,
             },
-            //last_x: 0,
         }
     }
 }
@@ -98,7 +98,6 @@ pub fn play_game() {
     let mut state = GameState::new();
 
     let game:bool = true;
-  //  let mut death:bool = false;
 
     while game {   
 
@@ -130,33 +129,41 @@ pub fn play_game() {
         if buffer == [100] {
             state.move_char.x += 1;
         }
-        if state.move_char.y == 0 {
-            ground_floor(&mut state, buffer);
-        } else if state.move_char.y == 1 {
-            first_floor(&mut state, buffer);
-        } else if state.move_char.y == -1 {
-            basement(&mut state, buffer, last);
-        } else if state.move_char.y == 2 {
-           climb_lamp(&mut state, buffer);
-        } else if state.move_char.y == -2 {
-            sewers(&mut state);
-        } else if state.move_char.y == 3 {
-            attic(&mut state, buffer);
-        }
-        ladder_up_down(&mut state, buffer);
-        wormman_move(&mut state);
 
-        println!("Step count: {}", state.move_char.step_count);
-
+        window_wormman(&mut state, buffer);
+        wormman_move(&mut state, buffer);
+        
         if state.death {
+            println!("Step count: {}", state.move_char.step_count);
             break;
         }
+        
+        let location = state.move_char.y;
+
+        match location { 
+              0 => ground_floor(&mut state, buffer),
+              1 =>  first_floor(&mut state, buffer),
+              -1 =>  basement(&mut state, buffer, last),
+              2 =>  climb_lamp(&mut state, buffer),
+              -2 =>  sewers(&mut state),
+              3 =>  attic(&mut state, buffer),
+              _ => {},
+        }
+        ladder_up_down(&mut state, buffer);
+
+
+
+          //print coordinates of hero and wormmen
+        println!("Hero: {} , {}", state.move_char.x, state.move_char.y);
+        if state.move_char.y == 1 || (state.move_char.x == 5 && state.move_char.y == 0) || state.move_char.y == 2  || (state.move_char.y == 3 && state.move_char.x == 10) {
+            if state.move_wormman.wormman {
+            println!("Wormman: {}, {}", state.move_wormman.x, state.move_wormman.y);
+        }
+        }
+        println!("Step count: {}", state.move_char.step_count);
+
         if buffer == [120] {
             break
-        }
-        println!("{} , {}", state.move_char.x, state.move_char.y);
-        if state.move_char.y == 1 || (state.move_char.x == 5 && state.move_char.y == 0) || state.move_char.y == 2  || (state.move_char.y == 3 && state.move_char.x == 10) {
-            println!("Wormman: {}, {}", state.move_wormman.wx1, state.move_wormman.wy1);
         }
     }
 }
