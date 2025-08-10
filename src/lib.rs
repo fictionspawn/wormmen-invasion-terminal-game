@@ -114,6 +114,8 @@ pub fn play_game() {
         reader.read_exact(&mut buffer).unwrap();
         tcsetattr(stdin, TCSANOW, & termios).unwrap();
 
+        window_wormman(&mut state, buffer);
+        wormman_move(&mut state, buffer);
         let last = state.move_char.x;
         state.move_char.step_count += 1;
 
@@ -129,12 +131,14 @@ pub fn play_game() {
         if buffer == [100] {
             state.move_char.x += 1;
         }
-
-        window_wormman(&mut state, buffer);
-        wormman_move(&mut state, buffer);
+/*
+        if (state.move_wormman.x == state.move_char.x || state.move_wormman.wkill == state.move_char.x) && state.move_char.y == state.move_wormman.y { 
+                println!("The wormman eats you alive as you scream in terror.");
+                state.death = true;
+            }*/
         
         if state.death {
-            println!("Step count: {}", state.move_char.step_count);
+          //  println!("Step count: {}", state.move_char.step_count);
             break;
         }
         

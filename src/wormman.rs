@@ -16,7 +16,7 @@ pub fn wormman_move(state: &mut GameState, buffer: [u8; 1]) {
             state.move_wormman.wkill = state.move_wormman.x - 1;
         }
             if state.move_wormman.y == state.move_char.y {
-        if state.move_wormman.x == state.move_char.x || state.move_wormman.wkill == state.move_char.x { 
+        if state.move_wormman.x == state.move_char.x || state.move_wormman.x + 1 == state.move_char.x || state.move_char.x == state.move_wormman.x - 1 { 
                 println!("The wormman eats you alive as you scream in terror.");
                 state.death = true;
             }

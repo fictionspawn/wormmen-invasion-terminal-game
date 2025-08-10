@@ -1,4 +1,5 @@
 use crate::{GameState};
+use crate::ladderupdown::staircase_up;
 
 pub fn basement(state: &mut GameState, buffer: [u8; 1], last: i32) {
     if state.move_char.x == 4 {
@@ -29,11 +30,13 @@ pub fn basement(state: &mut GameState, buffer: [u8; 1], last: i32) {
         } else { 
             something = "";
         }
-        println!("There's a staircase going up. {}", something);
         if buffer == [119] {
-            state.move_char.y = 0;
-            state.move_char.x = 1;
-            println!("There's a staircase going down.");
+            staircase_up(state);
+           // state.move_char.y = 1;
+           // state.move_char.x = 0;
+          //  println!("There's a staircase going down.");
+        } else {    
+        println!("There's a staircase going up. {}", something);
         }
     }
     if state.move_char.x == -6 {
