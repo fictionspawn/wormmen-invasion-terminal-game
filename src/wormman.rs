@@ -40,12 +40,12 @@ pub fn window_wormman(state: &mut GameState, buffer: [u8; 1]) {
         state.window_wormman.wormman = true;
         state.window_wormman.x = 12;
         state.window_wormman.y = 3;
-    } else { 
+    } else if state.window_wormman.wormman { 
         state.window_wormman.x -= 1;
         state.window_wormman.wkill = state.window_wormman.x - 1;
         println!("Wormman: {}, {}", state.window_wormman.x, state.window_wormman.y);
      
-        if (state.window_wormman.x == state.move_char.x || state.window_wormman.wkill == state.move_char.x) && state.window_wormman.wormman {
+        if (state.window_wormman.x == state.move_char.x || state.window_wormman.x + 1 == state.move_char.x || state.window_wormman.x - 1 == state.move_char.x) && state.window_wormman.wormman {
             state.death = true;
             println!("The wormman devours you. You die in horror.");
         } 

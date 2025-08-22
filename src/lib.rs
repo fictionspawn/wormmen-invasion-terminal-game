@@ -118,27 +118,28 @@ pub fn play_game() {
         wormman_move(&mut state, buffer);
         let last = state.move_char.x;
         state.move_char.step_count += 1;
+        
+        const A: [u8; 1] = [97];
+        const D: [u8; 1] = [100];
+        const I: [u8; 1] = [105];
+        const H: [u8; 1] = [104];
+        const X: [u8; 1] = [120];
 
-        if buffer == [104] {
+
+        if buffer == H {
             println!("Wormmen Invasion is a text based 2D platformer.\nMove your character using wasd. Press i for inventory.\nPress h for help. Press x to exit the game.");
         }
-        if buffer == ([105]) {
+        if buffer == I {
             println!("Inventory: {:?}", state.item.inventory);
         }
-        if buffer == [97] {
+        if buffer == A {
             state.move_char.x -= 1;
         }
-        if buffer == [100] {
+        if buffer == D {
             state.move_char.x += 1;
         }
-/*
-        if (state.move_wormman.x == state.move_char.x || state.move_wormman.wkill == state.move_char.x) && state.move_char.y == state.move_wormman.y { 
-                println!("The wormman eats you alive as you scream in terror.");
-                state.death = true;
-            }*/
         
         if state.death {
-          //  println!("Step count: {}", state.move_char.step_count);
             break;
         }
         
@@ -166,7 +167,7 @@ pub fn play_game() {
         }
         println!("Step count: {}", state.move_char.step_count);
 
-        if buffer == [120] {
+        if buffer == X {
             break
         }
     }

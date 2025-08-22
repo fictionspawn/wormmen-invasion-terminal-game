@@ -37,7 +37,7 @@ pub fn climb_lamp(state: &mut GameState, buffer: [u8;1]) {
         } else { 
             something = "";
         }
-    println!("You are in some kind of attic. Some crates and rubbish lie around.{}", something);
+    println!("You are in some kind of attic. Some crates and rubbish lie around. Moonlight from a window in the ceiling lights up the room.{}", something);
     state.move_char.y = 3;
     }
     if state.move_char.x < 10 || state.move_char.x > 10 {

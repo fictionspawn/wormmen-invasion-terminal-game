@@ -6,7 +6,13 @@ pub fn attic(state: &mut GameState, buffer: [u8; 1]) {
             state.move_char.y = 2;
             println!("You climb down the lamp chain. You stop by its crown.");
         } else {
-        println!("There's a chain lamp going down to the floor below. A wormman is crawling around down there.");
+            let something: &str;
+            if state.move_wormman.wormman {
+                something = "A wormman is crawling around down there.";
+            } else {
+                something = "";
+            }
+            println!("There's a chain lamp going down to the floor below. {}", something);
         }
     } else if state.move_char.x <= 5 {
         state.move_char.x = 5;
@@ -20,5 +26,8 @@ pub fn attic(state: &mut GameState, buffer: [u8; 1]) {
         } else {
             println!("What a horrible fate...");
         }
+    } else if state.move_char.x >= 17 {
+        state.move_char.x = 17;
+        println!("You've reached a wooded wall. You can hear wormmen on the other side, fighting among themselves.");
     }
 }
