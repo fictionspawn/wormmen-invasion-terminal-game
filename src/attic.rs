@@ -28,6 +28,6 @@ pub fn attic(state: &mut GameState, buffer: [u8; 1]) {
         }
     } else if state.move_char.x >= 17 {
         state.move_char.x = 17;
-        println!("You've reached a wooded wall. You can hear wormmen on the other side, fighting among themselves.");
+        println!("You've reached a wooden wall. You can hear wormmen on the other side, fighting among themselves.");
     }
 }
