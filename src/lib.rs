@@ -17,7 +17,7 @@ use std::io::Read;
 use std::io::Write;
 use termios::{Termios, TCSANOW, ECHO, ICANON, tcsetattr};
 
-
+//
 pub struct MoveChar {
     x: i32,
     y: i32,   
@@ -165,7 +165,7 @@ pub fn play_game() {
             println!("Wormman: {}, {}", state.move_wormman.x, state.move_wormman.y);
         }
         }
-        println!("Step count: {}", state.move_char.step_count);
+      //  println!("Step count: {}", state.move_char.step_count);
 
         if buffer == X {
             break
