@@ -46,14 +46,12 @@ pub fn climb_lamp(state: &mut GameState, buffer: [u8;1]) {
 }
 
 pub fn staircase_down(state: &mut GameState) {
-  //  if buffer == [115] {
         if state.item.inventory.contains(&"Lantern".to_string()) {
             println!("You walk down winding stone stairs. The light from your lantern flickers on the walls.\nStrange sounds are coming from the tunnel to the left. To your right there's a hole in the ground, and a wall further ahead.");
             state.move_char.y = -1;
             state.move_char.x = 2;
         } else {
             println!("It's too dark to go down there.");
-   //     }
     }
 }
 

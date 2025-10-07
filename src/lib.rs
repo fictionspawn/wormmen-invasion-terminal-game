@@ -17,7 +17,8 @@ use std::io::Read;
 use std::io::Write;
 use termios::{Termios, TCSANOW, ECHO, ICANON, tcsetattr};
 
-//
+// Defining structs for different game mechanics
+// Hero movements
 pub struct MoveChar {
     x: i32,
     y: i32,   
@@ -27,6 +28,7 @@ pub struct MoveChar {
     step_count: u32,
 }
 
+//Wormman movements
 pub struct MoveWormman {
     wormman_init: bool,
     wormman_right: bool,
@@ -36,6 +38,7 @@ pub struct MoveWormman {
     wkill: i32,
 }
 
+//Item manager
 pub struct Item {
     inventory: Vec<String>,
     lantern_picked_up: bool,
@@ -43,6 +46,7 @@ pub struct Item {
     blade_taken: bool,
 }
 
+//Defining them all in one gamestate struct
 pub struct GameState {
     pub move_char: MoveChar,
     pub item: Item,
@@ -91,7 +95,7 @@ impl GameState {
 
 
 pub fn intro() { 
-    println!("\nWelcome to WormmenInvasion! \n\nYou are at the ground floor. There's a brick wall to your left. \nThere's a ladder in sight, and a dim glow beyond the ladder. \n\nMove your character with wasd. Press i for inventory. Press h for help, x to exit the game.\n");
+    println!("\nWelcome to WormmenInvasion! \n\nYou are at the ground floor. There's a brick wall to your left. \nThere's a ladder in sight, and a dim glow beyond the ladder. \n\nMove your character with wasd. Press e for actions, i for inventory, h for help and x to exit the game.\n");
 }
 
 pub fn play_game() {
@@ -127,7 +131,7 @@ pub fn play_game() {
 
 
         if buffer == H {
-            println!("Wormmen Invasion is a text based 2D platformer.\nMove your character using wasd. Press i for inventory.\nPress h for help. Press x to exit the game.");
+            println!("Wormmen Invasion is a text based 2D platformer.\nMove your character using wasd. Press e for actions,\ni for inventory, h for help and x to exit the game.");
         }
         if buffer == I {
             println!("Inventory: {:?}", state.item.inventory);

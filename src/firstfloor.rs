@@ -15,13 +15,6 @@ pub fn first_floor(state: &mut GameState, buffer: [u8; 1]) {
         println!("Stone stairs lead down into darkness.");
         if buffer == [115] {
             staircase_down(state);
-          /*  if state.item.inventory.contains(&"Lantern".to_string()) {
-                println!("You are in a dark cellar, but your lantern guides the path.\nSome weird sounds can be heard from the tunnel to the left.\nTo the right there is a hole in the ground and a rock wall.");
-                state.move_char.y = -1;
-                state.move_char.x = 2;
-            } else {
-                println!("It's too dark to go down there.");
-            }*/
         }
     }
     if state.move_char.x < -2 {

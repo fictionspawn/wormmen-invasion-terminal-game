@@ -32,9 +32,6 @@ pub fn basement(state: &mut GameState, buffer: [u8; 1], last: i32) {
         }
         if buffer == [119] {
             staircase_up(state);
-           // state.move_char.y = 1;
-           // state.move_char.x = 0;
-          //  println!("There's a staircase going down.");
         } else {    
         println!("There's a staircase going up. {}", something);
         }
